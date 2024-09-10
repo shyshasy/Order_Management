@@ -1,5 +1,16 @@
 const pool = require('./db');
 
+// Fonction pour vérifier l'existence d'une commande
+async function orderExists(orderId) {
+  const connection = await pool.getConnection();
+  try {
+    const [order] = await connection.execute("SELECT id FROM purchase_orders WHERE id = ?", [orderId]);
+    return order.length > 0;
+  } finally {
+    connection.release();
+  }
+}
+
 // Fonction pour obtenir toutes les commandes
 async function getOrders() {
   const connection = await pool.getConnection();
@@ -18,7 +29,6 @@ async function getOrders() {
 async function addOrder(customerId, orderDate, deliveryAddress, trackNumber, status) {
   const connection = await pool.getConnection();
   try {
-    // Vérifier que le customerId existe avant d'ajouter la commande
     const [customer] = await connection.execute("SELECT id FROM customers WHERE id = ?", [customerId]);
     if (customer.length === 0) {
       throw new Error(`Customer with ID ${customerId} does not exist.`);
@@ -86,7 +96,6 @@ async function getOrderDetails(orderId) {
 async function updateOrderDetail(orderId, productId, quantity, price) {
   const connection = await pool.getConnection();
   try {
-    // Vérifier que l'orderId et le productId existent
     const [order] = await connection.execute("SELECT id FROM purchase_orders WHERE id = ?", [orderId]);
     if (order.length === 0) {
       throw new Error(`Order with ID ${orderId} does not exist.`);
@@ -114,7 +123,6 @@ async function updateOrderDetail(orderId, productId, quantity, price) {
 async function deleteOrderDetail(orderId, productId) {
   const connection = await pool.getConnection();
   try {
-    // Vérifier que l'orderId et le productId existent
     const [order] = await connection.execute("SELECT id FROM purchase_orders WHERE id = ?", [orderId]);
     if (order.length === 0) {
       throw new Error(`Order with ID ${orderId} does not exist.`);
@@ -142,13 +150,11 @@ async function deleteOrderDetail(orderId, productId) {
 async function updateOrder(orderId, customerId, orderDate, deliveryAddress, trackNumber, status) {
   const connection = await pool.getConnection();
   try {
-    // Check if the customer exists
     const [customer] = await connection.execute("SELECT id FROM customers WHERE id = ?", [customerId]);
     if (customer.length === 0) {
       throw new Error(`Customer with ID ${customerId} does not exist.`);
     }
 
-    // Update the order
     const [result] = await connection.execute(
       "UPDATE purchase_orders SET customer_id = ?, order_date = ?, delivery_address = ?, track_number = ?, status = ? WHERE id = ?",
       [customerId, orderDate, deliveryAddress, trackNumber, status, orderId]
@@ -162,41 +168,34 @@ async function updateOrder(orderId, customerId, orderDate, deliveryAddress, trac
   }
 }
 
-// Fonction pour supprimer une commande
-// Fonction pour supprimer une commande
+// Fonction pour supprimer une commande et ses détails
 async function deleteOrder(orderId) {
   const connection = await pool.getConnection();
   try {
-    // Check if there are details associated with the order
+    await connection.beginTransaction();
+
+    // Supprimer les détails de la commande s'ils existent
     const [details] = await connection.execute(
       "SELECT * FROM order_details WHERE order_id = ?",
       [orderId]
     );
-    
-    if (details.length === 0) {
-      console.log(`No details found for order ID ${orderId}`);
-    } else {
-      // Delete order details if any exist
-      await connection.execute(
-        "DELETE FROM order_details WHERE order_id = ?",
-        [orderId]
-      );
+    if (details.length > 0) {
+      await connection.execute("DELETE FROM order_details WHERE order_id = ?", [orderId]);
     }
 
-    // Delete the order itself
-    const [result] = await connection.execute(
-      "DELETE FROM purchase_orders WHERE id = ?",
-      [orderId]
-    );
+    // Supprimer la commande elle-même
+    const [result] = await connection.execute("DELETE FROM purchase_orders WHERE id = ?", [orderId]);
 
+    await connection.commit();
     return result.affectedRows;
   } catch (error) {
+    await connection.rollback();
+    console.error("Error deleting order:", error.message);
     throw error;
   } finally {
     connection.release();
   }
 }
-
 
 module.exports = { 
   getOrders, 
