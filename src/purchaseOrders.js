@@ -54,33 +54,44 @@ async function addOrderDetail(orderId, productId, quantity, price) {
     // Vérifier que l'orderId et le productId existent
     const [order] = await connection.execute("SELECT id FROM purchase_orders WHERE id = ?", [orderId]);
     if (order.length === 0) {
-      throw new Error(`Order with ID ${orderId} does not exist.`);
+      throw new Error(`La commande avec l'ID ${orderId} n'existe pas.`);
     }
 
     const [product] = await connection.execute("SELECT id FROM products WHERE id = ?", [productId]);
     if (product.length === 0) {
-      throw new Error(`Product with ID ${productId} does not exist.`);
+      throw new Error(`Le produit avec l'ID ${productId} n'existe pas.`);
     }
 
+    // Vérifier que le prix n'est pas null ou undefined
+    if (price === null || price === undefined || isNaN(price) || price <= 0) {
+      throw new Error("Le prix doit être un nombre positif non nul.");
+    }
+
+    // Exécuter la requête d'insertion
     const [result] = await connection.execute(
       "INSERT INTO order_details (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)",
       [orderId, productId, quantity, price]
     );
     return result.insertId;
   } catch (error) {
-    console.error("Error adding order detail:", error.message);
+    console.error("Erreur lors de l'ajout du détail de commande :", error.message);
     throw error;
   } finally {
     connection.release();
   }
 }
 
+
+// Fonction pour obtenir les détails d'une commande spécifique
 // Fonction pour obtenir les détails d'une commande spécifique
 async function getOrderDetails(orderId) {
-  const connection = await pool.getConnection();
+  const connection = await pool.getConnection(); // Obtenez une connexion à partir du pool
   try {
     const [rows] = await connection.execute(
-      "SELECT od.*, p.name AS product_name, p.description AS product_description FROM order_details od JOIN products p ON od.product_id = p.id WHERE od.order_id = ?",
+      `SELECT od.*, p.product_name AS product_name, p.description AS product_description
+       FROM order_details od
+       JOIN products p ON od.product_id = p.id
+       WHERE od.order_id = ?`,
       [orderId]
     );
     return rows;
@@ -88,9 +99,10 @@ async function getOrderDetails(orderId) {
     console.error("Error fetching order details:", error.message);
     throw error;
   } finally {
-    connection.release();
+    connection.release(); // Assurez-vous de libérer la connexion
   }
 }
+
 
 // Fonction pour mettre à jour un détail de commande
 async function updateOrderDetail(orderId, productId, quantity, price) {
@@ -120,19 +132,21 @@ async function updateOrderDetail(orderId, productId, quantity, price) {
 }
 
 // Fonction pour supprimer un détail de commande
+// Fonction pour supprimer un détail de commande
 async function deleteOrderDetail(orderId, productId) {
   const connection = await pool.getConnection();
   try {
-    const [order] = await connection.execute("SELECT id FROM purchase_orders WHERE id = ?", [orderId]);
-    if (order.length === 0) {
-      throw new Error(`Order with ID ${orderId} does not exist.`);
+    // Vérifiez si orderId et productId sont définis et valides
+    if (orderId === undefined || productId === undefined) {
+      throw new Error("Order ID or Product ID is undefined.");
     }
 
-    const [product] = await connection.execute("SELECT id FROM products WHERE id = ?", [productId]);
-    if (product.length === 0) {
-      throw new Error(`Product with ID ${productId} does not exist.`);
+    // Vérifiez que orderId et productId ne sont pas null
+    if (orderId === null || productId === null) {
+      throw new Error("Order ID or Product ID cannot be null.");
     }
 
+    // Exécutez la requête de suppression
     const [result] = await connection.execute(
       "DELETE FROM order_details WHERE order_id = ? AND product_id = ?",
       [orderId, productId]
@@ -145,6 +159,7 @@ async function deleteOrderDetail(orderId, productId) {
     connection.release();
   }
 }
+
 
 // Fonction pour mettre à jour une commande
 async function updateOrder(orderId, customerId, orderDate, deliveryAddress, trackNumber, status) {

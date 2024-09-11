@@ -189,51 +189,50 @@ async function handleOrderMenu() {
         console.log("Commande supprimée avec succès !");
         break;
 
-      case '5':
-        const orderIdForDetails = readlineSync.questionInt("ID de la commande pour gérer les détails: ");
-        let detailChoice;
-        do {
-          detailChoice = await orderDetailMenu(orderIdForDetails);
-          switch (detailChoice) {
-            case '1':
-              const productId = readlineSync.questionInt("ID du produit: ");
-              const quantity = readlineSync.questionInt("Quantité: ");
-              await orderManager.addOrderDetail(orderIdForDetails, productId, quantity);
-              console.log("Détail de commande ajouté avec succès !");
-              break;
-
-            case '2':
-              const orderDetailIdToUpdate = readlineSync.questionInt("ID du détail de commande à mettre à jour: ");
-              const newProductId = readlineSync.questionInt("Nouveau ID du produit: ");
-              const newQuantity = readlineSync.questionInt("Nouvelle quantité: ");
-              await orderManager.updateOrderDetail(orderDetailIdToUpdate, newProductId, newQuantity);
-              console.log("Détail de commande mis à jour avec succès !");
-              break;
-
-            case '3':
-              const orderDetailIdToDelete = readlineSync.questionInt("ID du détail de commande à supprimer: ");
-              await orderManager.deleteOrderDetail(orderDetailIdToDelete);
-              console.log("Détail de commande supprimé avec succès !");
-              break;
-
-            case '4':
-              const orderDetails = await orderManager.getOrderDetails(orderIdForDetails);
-              console.log("Détails de la commande:", orderDetails);
-              break;
-
-            case '0':
-              console.log("Retour au menu des commandes");
-              break;
-
-            default:
-              console.log("Choix invalide, veuillez réessayer.");
-          }
-        } while (detailChoice !== '0');
-        break;
-
-      case '0':
-        console.log("Retour au menu principal");
-        break;
+        case '5':
+          const orderIdForDetails = readlineSync.questionInt("ID de la commande pour gérer les détails: ");
+          let detailChoice;
+          do {
+            detailChoice = await orderDetailMenu(orderIdForDetails);
+            switch (detailChoice) {
+              case '1':
+                const productId = readlineSync.questionInt("ID du produit: ");
+                const quantity = readlineSync.questionInt("Quantité: ");
+                const price = readlineSync.questionFloat("Prix du produit: ");  // Ajout de la demande pour le prix
+                await orderManager.addOrderDetail(orderIdForDetails, productId, quantity, price);  // Passer le prix à la fonction
+                console.log("Détail de commande ajouté avec succès !");
+                break;
+        
+              case '2':
+                const orderDetailIdToUpdate = readlineSync.questionInt("ID du détail de commande à mettre à jour: ");
+                const newProductId = readlineSync.questionInt("Nouveau ID du produit: ");
+                const newQuantity = readlineSync.questionInt("Nouvelle quantité: ");
+                const newPrice = readlineSync.questionFloat("Nouveau prix: ");  // Ajout de la demande pour le nouveau prix
+                await orderManager.updateOrderDetail(orderDetailIdToUpdate, newProductId, newQuantity, newPrice);  // Passer le prix à la fonction
+                console.log("Détail de commande mis à jour avec succès !");
+                break;
+        
+              case '3':
+                const orderDetailIdToDelete = readlineSync.questionInt("ID du détail de commande à supprimer: ");
+                await orderManager.deleteOrderDetail(orderDetailIdToDelete);
+                console.log("Détail de commande supprimé avec succès !");
+                break;
+        
+              case '4':
+                const orderDetails = await orderManager.getOrderDetails(orderIdForDetails);
+                console.log("Détails de la commande:", orderDetails);
+                break;
+        
+              case '0':
+                console.log("Retour au menu des commandes");
+                break;
+        
+              default:
+                console.log("Choix invalide, veuillez réessayer.");
+            }
+          } while (detailChoice !== '0');
+          break;
+        
 
       default:
         console.log("Choix invalide, veuillez réessayer.");
@@ -258,25 +257,37 @@ async function handlePaymentMenu() {
     switch (choix) {
       case '1':
         const orderId = readlineSync.questionInt("ID de la commande: ");
-        const amount = readlineSync.questionFloat("Montant du paiement: ");
         const paymentDate = readlineSync.question("Date du paiement (YYYY-MM-DD): ");
-        const paymentMethod = readlineSync.question("Méthode de paiement: ");
-        await paymentManager.addPayment(orderId, amount, paymentDate, paymentMethod);
+        const amount = readlineSync.questionFloat("Montant du paiement: ");
+        const paymentMethod = readlineSync.question("Méthode de paiement (e.g., carte de crédit, virement): "); // Correct input for payment method
+        await paymentManager.addPayment(orderId, paymentDate, amount, paymentMethod);
         console.log("Paiement ajouté avec succès !");
         break;
+    
 
       case '2':
-        const payments = await paymentManager.getPayments();
-        console.log("Liste des paiements:", payments);
+        try {
+          const payments = await paymentManager.getPayments();
+          if (payments.length === 0) {
+            console.log("Aucun paiement trouvé.");
+          } else {
+            console.log("Liste des paiements:");
+            payments.forEach(payment => {
+              console.log(`ID: ${payment._id}, Commande ID: ${payment.orderId}, Date: ${payment.paymentDate}, Montant: ${payment.amount}, Méthode: ${payment.paymentMethod}`);
+            });
+          }
+        } catch (err) {
+          console.error("Erreur lors de la récupération des paiements:", err);
+        }
         break;
 
       case '3':
         const paymentIdToUpdate = readlineSync.questionInt("ID du paiement à mettre à jour: ");
-        const newOrderId = readlineSync.questionInt("Nouvel ID de la commande: ");
-        const newAmount = readlineSync.questionFloat("Nouveau montant du paiement: ");
+        const newOrderId = readlineSync.questionInt("Nouvel ID de commande: ");
         const newPaymentDate = readlineSync.question("Nouvelle date du paiement (YYYY-MM-DD): ");
+        const newAmount = readlineSync.questionFloat("Nouveau montant du paiement: ");
         const newPaymentMethod = readlineSync.question("Nouvelle méthode de paiement: ");
-        await paymentManager.updatePayment(paymentIdToUpdate, newOrderId, newAmount, newPaymentDate, newPaymentMethod);
+        await paymentManager.updatePayment(paymentIdToUpdate, newOrderId, newPaymentDate, newAmount, newPaymentMethod);
         console.log("Paiement mis à jour avec succès !");
         break;
 
@@ -295,6 +306,7 @@ async function handlePaymentMenu() {
     }
   } while (choix !== '0');
 }
+
 
 async function main() {
   let choix;

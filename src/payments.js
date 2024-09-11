@@ -1,57 +1,81 @@
-const mysql = require('mysql2/promise');
 const pool = require('./db');
 
-// Function to get all payments
+// Fonction pour obtenir tous les paiements
 async function getPayments() {
-  const connection = await pool.getConnection();
   try {
-    const [rows] = await connection.execute("SELECT * FROM payments");
+    const connection = await pool.getConnection();
+    const [rows] = await connection.execute('SELECT * FROM payments');
+    connection.release();
     return rows;
   } catch (error) {
+    console.error("Erreur lors de la récupération des paiements:", error);
     throw error;
-  } finally {
-    connection.release();
   }
 }
 
-// Function to add a payment
+// Fonction pour ajouter un paiement
 const addPayment = async (orderId, date, amount, paymentMethod) => {
-  // Debugging: Log the values
-  console.log('Order ID:', orderId);
-  console.log('Date provided:', date);
-  console.log('Amount provided:', amount);
-  console.log('Payment Method:', paymentMethod);
-
-  // Ensure date is a string and correctly formatted
-  const formattedDate = new Date(date).toISOString().split('T')[0];
-  console.log('Formatted date:', formattedDate);
-
-  // Validate date format
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(formattedDate)) {
-    throw new Error('Invalid date format. Use YYYY-MM-DD.');
-  }
-
-  // Ensure amount is a number
-  const formattedAmount = parseFloat(amount);
-  if (isNaN(formattedAmount)) {
-    throw new Error('Invalid amount value. Must be a number.');
-  }
-
-  const connection = await pool.getConnection();
   try {
-    await connection.execute(
-      'INSERT INTO payments (order_id, date, amount, payment_method) VALUES (?, ?, ?, ?)',
-      [orderId, formattedDate, formattedAmount, paymentMethod]
-    );
-    console.log('Payment added successfully.');
+    // Debugging: Log les valeurs
+    console.log('Order ID:', orderId);
+    console.log('Date provided:', date);
+    console.log('Amount provided:', amount);
+    console.log('Payment Method:', paymentMethod);
+
+    // Vérification du format de la date (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(date)) {
+      throw new Error('Le format de la date est invalide. Utilisez le format YYYY-MM-DD.');
+    }
+
+    // Validation de la date
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      throw new Error('La date fournie est invalide.');
+    }
+
+    const formattedDate = parsedDate.toISOString().split('T')[0];
+    console.log('Formatted date:', formattedDate);
+
+    // Validation du montant
+    const formattedAmount = parseFloat(amount);
+    if (isNaN(formattedAmount)) {
+      throw new Error('Le montant fourni est invalide. Il doit être un nombre.');
+    }
+
+    // Vérification si l'order_id existe dans la table purchase_orders
+    const connection = await pool.getConnection();
+    try {
+      const [orderRows] = await connection.execute(
+        'SELECT id FROM purchase_orders WHERE id = ?',
+        [orderId]
+      );
+
+      if (orderRows.length === 0) {
+        throw new Error(`La commande avec l'ID ${orderId} n'existe pas.`);
+      }
+
+      // Ajout du paiement si la commande existe
+      await connection.execute(
+        'INSERT INTO payments (order_id, date, amount, payment_method) VALUES (?, ?, ?, ?)',
+        [orderId, formattedDate, formattedAmount, paymentMethod]
+      );
+    
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout du paiement :', error.message);
+      throw error;
+    } finally {
+      connection.release();
+    }
   } catch (error) {
-    console.error('Error adding payment:', error.message);
-  } finally {
-    connection.release();
+    console.error('Erreur dans addPayment :', error.message);
+    throw error;
   }
 };
 
-// Function to update a payment
+
+
+// Fonction pour mettre à jour un paiement
 async function updatePayment(paymentId, orderId, paymentDate, amount, paymentMethod) {
   const connection = await pool.getConnection();
   try {
@@ -67,7 +91,7 @@ async function updatePayment(paymentId, orderId, paymentDate, amount, paymentMet
   }
 }
 
-// Function to delete a payment
+// Fonction pour supprimer un paiement
 async function deletePayment(paymentId) {
   const connection = await pool.getConnection();
   try {
