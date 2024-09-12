@@ -12,41 +12,43 @@ Le dépôt du projet est accessible à l'adresse suivante :
 Ce projet vise à gérer les entités clés de **ABC Corporation** (clients, produits, commandes) via une application Node.js interagissant avec une base de données MySQL. Il permet d'effectuer les opérations CRUD (Create, Read, Update, Delete) sur ces entités.
 
 ## Prérequis
-- **Node.js**  
-- **MySQL**  
-- **npm** (Node Package Manager)
+- [Node.js ](https://nodejs.org/fr)
+- [MySQL ](https://www.mysql.com/)
+- [Readline-sync](https://www.npmjs.com/package/readline-sync)
 
 ### Dépendances Node.js
 Installez les dépendances nécessaires avec la commande suivante :
 ```bash
 npm install mysql2 inquirer
-
+```
 # Fonctionnalités
 
 ## Gestion des clients
-- **Lister tous les clients**
-- **Ajouter un client**
-- **Mettre à jour un client**
-- **Supprimer un client**
+- Lister tous les clients
+- Ajouter un client
+- Mettre à jour un client
+- Supprimer un client
 
 ### des produits
-- **Lister tous les produits**
-- **Ajouter un produit**
-- **Mettre à jour un produit**
-- **Supprimer un produit**
+- Lister tous les produits
+- Ajouter un produit
+- Mettre à jour un produit
+- Supprimer un produit
 
 ## Gestion des commandes
-- **Ajouter une commande avec détails**
-- **Mettre à jour une commande**
-- **Supprimer une commande**
+- Ajouter une commande avec détails
+- Mettre à jour une commande
+- Supprimer une commande
 
 ##Installation et Exécution
 
-````bash
-git clone https://github.com/shyshasy/Update_ABC_Corporation_db
-````
 
-````bash
+```bash
+git clone https://github.com/shyshasy/Update_ABC_Corporation_db
+```
+
+
+```bash
 cd Update_ABC_Corporation_db
 ````
 ## Installer les dépendances :
