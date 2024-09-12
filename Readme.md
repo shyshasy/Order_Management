@@ -9,7 +9,7 @@ Le dépôt du projet est accessible à l'adresse suivante :
 [https://github.com/shyshasy/Update_ABC_Corporation_db](https://github.com/shyshasy/Update_ABC_Corporation_db)
 
 ## Description
-Ce projet vise à gérer les entités clés de **ABC Corporation** (clients, produits, commandes) via une application Node.js interagissant avec une base de données MySQL. Il permet d'effectuer les opérations CRUD (Create, Read, Update, Delete) sur ces entités.
+Ce projet vise à gérer les entités clés de **ABC Corporation** (clients, produits, commandes, paiements) via une application Node.js interagissant avec une base de données MySQL. Il permet d'effectuer les opérations CRUD (Create, Read, Update, Delete) sur ces entités.
 
 ## Prérequis
 - [Node.js ](https://nodejs.org/fr)
@@ -19,7 +19,7 @@ Ce projet vise à gérer les entités clés de **ABC Corporation** (clients, pro
 ### Dépendances Node.js
 Installez les dépendances nécessaires avec la commande suivante :
 ```bash
-npm install mysql2 inquirer
+npm install mysql2 
 ```
 # Fonctionnalités
 
@@ -40,7 +40,12 @@ npm install mysql2 inquirer
 - Mettre à jour une commande
 - Supprimer une commande
 
-##Installation et Exécution
+## Gestion des paiements
+- Ajouter un paiement
+- Mettre à jour un paiement
+- Supprimer un paiement
+
+## Installation et Exécution##
 
 
 ```bash
