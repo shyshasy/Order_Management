@@ -1,19 +1,64 @@
-# Documentation des Fonctionnalités
+# Update ABC Corporation DB
 
 ## Auteur
-**Aichetou Taher SY**
+
+[Aichetou Taher SY](https://github.com/shyshasy)
 
 ## Dépôt
-Le dépôt pour ce projet est disponible à l'adresse suivante : [https://github.com/shyshasy/Update_ABC_Corporation_db](https://github.com/shyshasy/Update_ABC_Corporation_db)
+Le dépôt du projet est accessible à l'adresse suivante :  
+[https://github.com/shyshasy/Update_ABC_Corporation_db](https://github.com/shyshasy/Update_ABC_Corporation_db)
 
-## Dépendances
-Assurez-vous d'avoir les dépendances suivantes installées pour faire fonctionner ce projet :
+## Description
+Ce projet vise à gérer les entités clés de **ABC Corporation** (clients, produits, commandes) via une application Node.js interagissant avec une base de données MySQL. Il permet d'effectuer les opérations CRUD (Create, Read, Update, Delete) sur ces entités.
 
-- **MySQL** : Base de données relationnelle utilisée pour stocker les données.
-- **Node.js** : Environnement d'exécution JavaScript utilisé pour exécuter le code.
-- **mysql2** : Pour interagir avec MySQL dans Node.js.
-- **inquirer** : Pour les interactions en ligne de commande.
+## Prérequis
+- **Node.js**  
+- **MySQL**  
+- **npm** (Node Package Manager)
 
-Vous pouvez installer les dépendances nécessaires avec la commande suivante :
+### Dépendances Node.js
+Installez les dépendances nécessaires avec la commande suivante :
 ```bash
 npm install mysql2 inquirer
+
+# Fonctionnalités
+
+## Gestion des clients
+- **Lister tous les clients**
+- **Ajouter un client**
+- **Mettre à jour un client**
+- **Supprimer un client**
+
+### des produits
+- **Lister tous les produits**
+- **Ajouter un produit**
+- **Mettre à jour un produit**
+- **Supprimer un produit**
+
+## Gestion des commandes
+- **Ajouter une commande avec détails**
+- **Mettre à jour une commande**
+- **Supprimer une commande**
+
+##Installation et Exécution
+
+````bash
+git clone https://github.com/shyshasy/Update_ABC_Corporation_db
+````
+
+````bash
+cd Update_ABC_Corporation_db
+````
+## Installer les dépendances :
+
+````bash
+npm install
+````
+
+Configurez la connexion MySQL dans le fichier db.js 
+
+Lancez l'application :
+
+```bash
+node index.js
+````
