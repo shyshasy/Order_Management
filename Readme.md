@@ -45,7 +45,7 @@ npm install mysql2
 - Mettre à jour un paiement
 - Supprimer un paiement
 
-## Installation et Exécution##
+## Installation et Exécution
 
 
 ```bash
