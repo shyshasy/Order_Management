@@ -1,12 +1,12 @@
 const connPool = require('./db');
 
 // Ajouter un produit
-async function addProduct(productName, description, price, stock, category, barcode, status) {
+async function addProduct(name, description, price, stock, category, barcode, status) {
   const connection = await connPool.getConnection();
   try {
     const [result] = await connection.execute(
-      "INSERT INTO products (product_name, description, price, stock, category, barcode, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [productName, description, price, stock, category, barcode, status]
+      "INSERT INTO products (name, description, price, stock, category, barcode, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [name, description, price, stock, category, barcode, status]
     );
     console.log("Produit ajouté avec succès !");
     return result.insertId;
@@ -33,12 +33,12 @@ async function getProducts() {
 }
 
 // Mettre à jour un produit
-async function updateProduct(id, productName, description, price, stock, category, barcode, status) {
+async function updateProduct(id, name, description, price, stock, category, barcode, status) {
   const connection = await connPool.getConnection();
   try {
     const [result] = await connection.execute(
-      "UPDATE products SET product_name = ?, description = ?, price = ?, stock = ?, category = ?, barcode = ?, status = ? WHERE id = ?",
-      [productName, description, price, stock, category, barcode, status, id]
+      "UPDATE products SET name = ?, description = ?, price = ?, stock = ?, category = ?, barcode = ?, status = ? WHERE id = ?",
+      [name, description, price, stock, category, barcode, status, id]
     );
     console.log("Produit mis à jour avec succès !");
     return result.affectedRows;
@@ -51,21 +51,42 @@ async function updateProduct(id, productName, description, price, stock, categor
 }
 
 // Supprimer un produit
-async function deleteProduct(id) {
-  const connection = await connPool.getConnection();
+const db = require('./db'); // Assurez-vous que le chemin est correct
+
+async function deleteProduct(productId) {
+  let connection;
   try {
-    const [result] = await connection.execute(
-      "DELETE FROM products WHERE id = ?",
-      [id]
-    );
-    console.log("Produit supprimé avec succès !");
-    return result.affectedRows;
-  } catch (error) {
-    console.error("Erreur lors de la suppression du produit:", error.message);
-    throw error;
+    connection = await db.getConnection();
+    
+    // Supprimer les détails de commande associés
+    const [result1] = await connection.query('DELETE FROM order_details WHERE product_id = ?', [productId]);
+    console.log(`Deleted ${result1.affectedRows} rows from order_details.`);
+
+    // Supprimer le produit
+    const [result2] = await connection.query('DELETE FROM products WHERE id = ?', [productId]);
+    console.log(`Deleted ${result2.affectedRows} rows from products.`);
+    
+    if (result2.affectedRows === 0) {
+      console.log(`No product found with ID ${productId}.`);
+    } else {
+      console.log(`Product with ID ${productId} supprimer avec succès.`);
+    }
+  } catch (err) {
+    console.error('Error deleting product:', err);
   } finally {
-    connection.release();
+    if (connection) {
+      connection.release();
+    }
   }
 }
+
+module.exports = {
+  deleteProduct
+};
+
+
+module.exports = {
+  deleteProduct
+};
 
 module.exports = { addProduct, getProducts, updateProduct, deleteProduct };

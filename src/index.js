@@ -83,52 +83,57 @@ async function handleProductMenu() {
   let choix;
   do {
     choix = await productMenu();
-    switch (choix) {
-      case '1':
-        const productName = readlineSync.question("Nom du produit: ");
-        const description = readlineSync.question("Description du produit: ");
-        const price = readlineSync.questionFloat("Prix du produit: ");
-        const stock = readlineSync.questionInt("Quantité en stock: ");
-        const category = readlineSync.question("Catégorie du produit: ");
-        const barcode = readlineSync.question("Code-barres du produit: ");
-        const status = readlineSync.question("Statut (available/unavailable): ");
-        await productManager.addProduct(productName, description, price, stock, category, barcode, status);
-        console.log("Produit ajouté avec succès !");
-        break;
+    try {
+      switch (choix) {
+        case '1':
+          const productName = readlineSync.question("Nom du produit: ");
+          const description = readlineSync.question("Description du produit: ");
+          const price = readlineSync.questionFloat("Prix du produit: ");
+          const stock = readlineSync.questionInt("Quantité en stock: ");
+          const category = readlineSync.question("Catégorie du produit: ");
+          const barcode = readlineSync.question("Code-barres du produit: ");
+          const status = readlineSync.question("Statut (available/unavailable): ");
+          await productManager.addProduct(productName, description, price, stock, category, barcode, status);
+          console.log("Produit ajouté avec succès !");
+          break;
 
-      case '2':
-        const products = await productManager.getProducts();
-        console.log("Liste des produits:", products);
-        break;
+        case '2':
+          const products = await productManager.getProducts();
+          console.log("Liste des produits:", products);
+          break;
 
-      case '3':
-        const productIdToUpdate = readlineSync.questionInt("ID du produit à mettre à jour: ");
-        const newProductName = readlineSync.question("Nouveau nom du produit: ");
-        const newDescription = readlineSync.question("Nouvelle description du produit: ");
-        const newPrice = readlineSync.questionFloat("Nouveau prix du produit: ");
-        const newStock = readlineSync.questionInt("Nouvelle quantité en stock: ");
-        const newCategory = readlineSync.question("Nouvelle catégorie du produit: ");
-        const newBarcode = readlineSync.question("Nouveau code-barres du produit: ");
-        const newStatus = readlineSync.question("Nouveau statut (available/unavailable): ");
-        await productManager.updateProduct(productIdToUpdate, newProductName, newDescription, newPrice, newStock, newCategory, newBarcode, newStatus);
-        console.log("Produit mis à jour avec succès !");
-        break;
+        case '3':
+          const productIdToUpdate = readlineSync.questionInt("ID du produit à mettre à jour: ");
+          const newProductName = readlineSync.question("Nouveau nom du produit: ");
+          const newDescription = readlineSync.question("Nouvelle description du produit: ");
+          const newPrice = readlineSync.questionFloat("Nouveau prix du produit: ");
+          const newStock = readlineSync.questionInt("Nouvelle quantité en stock: ");
+          const newCategory = readlineSync.question("Nouvelle catégorie du produit: ");
+          const newBarcode = readlineSync.question("Nouveau code-barres du produit: ");
+          const newStatus = readlineSync.question("Nouveau statut (available/unavailable): ");
+          await productManager.updateProduct(productIdToUpdate, newProductName, newDescription, newPrice, newStock, newCategory, newBarcode, newStatus);
+          console.log("Produit mis à jour avec succès !");
+          break;
 
-      case '4':
-        const productIdToDelete = readlineSync.questionInt("ID du produit à supprimer: ");
-        await productManager.deleteProduct(productIdToDelete);
-        console.log("Produit supprimé avec succès !");
-        break;
+        case '4':
+          const productIdToDelete = readlineSync.questionInt("ID du produit à supprimer: ");
+          await productManager.deleteProduct(productIdToDelete);
+          console.log("Produit supprimé avec succès !");
+          break;
 
-      case '0':
-        console.log("Retour au menu principal");
-        break;
+        case '0':
+          console.log("Retour au menu principal");
+          break;
 
-      default:
-        console.log("Choix invalide, veuillez réessayer.");
+        default:
+          console.log("Choix invalide, veuillez réessayer.");
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'exécution de l\'option:', error);
     }
   } while (choix !== '0');
 }
+
 
 async function orderMenu() {
   const choices = [
@@ -311,35 +316,68 @@ async function paymentMenu() {
 }
 
 async function handlePaymentMenu() {
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
   let choix;
   do {
-    choix = await paymentMenu();
+    choix = await paymentMenu(); // Supposons que paymentMenu() retourne une promesse avec le choix de l'utilisateur
     switch (choix) {
       case '1':
         const paymentOrderId = readlineSync.questionInt("ID de la commande associée au paiement: ");
         const paymentAmount = readlineSync.questionFloat("Montant du paiement: ");
         const paymentDate = readlineSync.question("Date du paiement (YYYY-MM-DD): ");
-        await paymentManager.addPayment(paymentOrderId, paymentAmount, paymentDate);
-        console.log("Paiement ajouté avec succès !");
+        const paymentMethod = readlineSync.question("Méthode de paiement: "); // Ajout d'une méthode de paiement
+
+        if (!dateRegex.test(paymentDate)) {
+          console.log('Erreur : Le format de la date est invalide. Utilisez le format YYYY-MM-DD.');
+          break;
+        }
+
+        try {
+          await paymentManager.addPayment(paymentOrderId, paymentDate, paymentAmount, paymentMethod);
+          console.log("Paiement ajouté avec succès !");
+        } catch (error) {
+          console.error('Erreur lors de l\'ajout du paiement:', error.message);
+        }
         break;
 
       case '2':
-        const payments = await paymentManager.getPayments();
-        console.log("Liste des paiements:", payments);
+        try {
+          const payments = await paymentManager.getPayments();
+          console.log("Liste des paiements:", payments);
+        } catch (error) {
+          console.error('Erreur lors de la récupération des paiements:', error.message);
+        }
         break;
 
       case '3':
         const paymentIdToUpdate = readlineSync.questionInt("ID du paiement à mettre à jour: ");
+        const newPaymentOrderId = readlineSync.questionInt("Nouvel ID de la commande associée au paiement: ");
         const newPaymentAmount = readlineSync.questionFloat("Nouveau montant du paiement: ");
         const newPaymentDate = readlineSync.question("Nouvelle date du paiement (YYYY-MM-DD): ");
-        await paymentManager.updatePayment(paymentIdToUpdate, newPaymentAmount, newPaymentDate);
-        console.log("Paiement mis à jour avec succès !");
+        const newPaymentMethod = readlineSync.question("Nouvelle méthode de paiement: ");
+
+        if (!dateRegex.test(newPaymentDate)) {
+          console.log('Erreur : Le format de la date est invalide. Utilisez le format YYYY-MM-DD.');
+          break;
+        }
+
+        try {
+          await paymentManager.updatePayment(paymentIdToUpdate, newPaymentOrderId, newPaymentDate, newPaymentAmount, newPaymentMethod);
+          console.log("Paiement mis à jour avec succès !");
+        } catch (error) {
+          console.error('Erreur lors de la mise à jour du paiement:', error.message);
+        }
         break;
 
       case '4':
         const paymentIdToDelete = readlineSync.questionInt("ID du paiement à supprimer: ");
-        await paymentManager.deletePayment(paymentIdToDelete);
-        console.log("Paiement supprimé avec succès !");
+        try {
+          await paymentManager.deletePayment(paymentIdToDelete);
+          console.log("Paiement supprimé avec succès !");
+        } catch (error) {
+          console.error('Erreur lors de la suppression du paiement:', error.message);
+        }
         break;
 
       case '0':

@@ -25,7 +25,7 @@ async function getOrders() {
   }
 }
 
-/// Ajouter une commande avec ses détails
+// Ajouter une commande avec ses détails
 async function addOrderWithDetails(customerId, orderDate, deliveryAddress, trackNumber, status, orderDetails) {
   const connection = await pool.getConnection();
   try {
@@ -76,7 +76,7 @@ async function addOrderWithDetails(customerId, orderDate, deliveryAddress, track
 
     // Ajouter la commande
     const [result] = await connection.execute(
-      "INSERT INTO purchase_orders (customer_id, order_date, delivery_address, track_number, status) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO purchase_orders (customer_id, date, delivery_address, track_number, status) VALUES (?, ?, ?, ?, ?)",
       [parsedCustomerId, orderDate, deliveryAddress, trackNumber, status]
     );
     
@@ -104,10 +104,8 @@ async function addOrderWithDetails(customerId, orderDate, deliveryAddress, track
   }
 }
 
-
-
 // Mettre à jour une commande et ses détails
-async function updateOrderWithDetails( orderId, customerId, orderDate, deliveryAddress, trackNumber, status, orderDetails) {
+async function updateOrderWithDetails(orderId, customerId, orderDate, deliveryAddress, trackNumber, status, orderDetails) {
   const connection = await pool.getConnection();
   try {
     // Vérification si la commande existe avant la mise à jour
@@ -124,7 +122,7 @@ async function updateOrderWithDetails( orderId, customerId, orderDate, deliveryA
     await connection.beginTransaction();
 
     await connection.execute(
-      "UPDATE purchase_orders SET customer_id = ?, order_date = ?, delivery_address = ?, track_number = ?, status = ? WHERE id = ?",
+      "UPDATE purchase_orders SET customer_id = ?, date = ?, delivery_address = ?, track_number = ?, status = ? WHERE id = ?",
       [customerId, orderDate, deliveryAddress, trackNumber, status, orderId]
     );
 
@@ -193,13 +191,15 @@ async function deleteOrderWithDetails(orderId) {
 async function getOrderWithDetails(orderId) {
   const connection = await pool.getConnection();
   try {
+    // Récupérer la commande
     const [order] = await connection.execute("SELECT * FROM purchase_orders WHERE id = ?", [orderId]);
     if (order.length === 0) {
       throw new Error(`La commande avec l'ID ${orderId} n'existe pas.`);
     }
 
+    // Récupérer les détails de la commande avec les informations sur les produits
     const [details] = await connection.execute(
-      `SELECT od.*, p.product_name AS product_name, p.description AS product_description
+      `SELECT od.*, p.name AS product_name, p.description AS product_description
        FROM order_details od
        JOIN products p ON od.product_id = p.id
        WHERE od.order_id = ?`,
@@ -214,6 +214,7 @@ async function getOrderWithDetails(orderId) {
     connection.release();
   }
 }
+
 
 module.exports = {
   getOrders,

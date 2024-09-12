@@ -15,12 +15,12 @@ async function getCustomers() {
 }
 
 // Ajouter un client
-async function addCustomer(customerName, email, phone, address) {
+async function addCustomer(name, email, phone, address) {
   const connection = await pool.getConnection();
   try {
     const [result] = await connection.execute(
-      "INSERT INTO customers (customer_name, email, phone, address) VALUES (?, ?, ?, ?)",
-      [customerName, email, phone, address]
+      "INSERT INTO customers (name, email, phone, address) VALUES (?, ?, ?, ?)",
+      [name, email, phone, address]
     );
     return result.insertId;
   } catch (error) {
@@ -32,12 +32,12 @@ async function addCustomer(customerName, email, phone, address) {
 }
 
 // Mettre à jour un client
-async function updateCustomer(customerId, customerName, email, phone, address) {
+async function updateCustomer(customerId, name, email, phone, address) {
   const connection = await pool.getConnection();
   try {
     const [result] = await connection.execute(
-      "UPDATE customers SET customer_name = ?, email = ?, phone = ?, address = ? WHERE id = ?",
-      [customerName, email, phone, address, customerId]
+      "UPDATE customers SET name = ?, email = ?, phone = ?, address = ? WHERE id = ?",
+      [name, email, phone, address, customerId]
     );
     return result.affectedRows;
   } catch (error) {
@@ -84,5 +84,5 @@ module.exports = {
   addCustomer,
   updateCustomer,
   deleteCustomer,
-  getCustomerById // Assurez-vous que cette fonction est exportée
+  getCustomerById
 };
