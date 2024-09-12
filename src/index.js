@@ -4,7 +4,6 @@ const productManager = require('./products');
 const orderManager = require('./purchaseOrders');
 const paymentManager = require('./payments');
 
-
 async function mainMenu() {
   console.log("1. Gestion des clients");
   console.log("2. Gestion des produits");
@@ -269,7 +268,8 @@ async function updateOrder() {
   }
 
   try {
-    await orderManager.updateOrder(orderId, newOrderDate, newDeliveryAddress, newTrackNumber, newStatus);
+    
+    await orderManager.updateOrderWithDetails,(orderId, newOrderDate, newDeliveryAddress, newTrackNumber, newStatus);
     console.log('Commande mise à jour avec succès.');
   } catch (error) {
     console.error('Erreur lors de la mise à jour de la commande:', error.message);
