@@ -281,7 +281,7 @@ async function deleteOrder() {
   const orderId = readlineSync.questionInt('ID de la commande à supprimer: ');
 
   try {
-    await orderManager.deleteOrder(orderId);
+    await orderManager.deleteOrderWithDetails,(orderId);
     console.log('Commande supprimée avec succès.');
   } catch (error) {
     console.error('Erreur lors de la suppression de la commande:', error.message);
