@@ -1,4 +1,4 @@
-# Update ABC Corporation DB
+# Order_Management
 
 ## Auteur
 
@@ -6,7 +6,7 @@
 
 ## Dépôt
 Le dépôt du projet est accessible à l'adresse suivante :  
-[https://github.com/shyshasy/Update_ABC_Corporation_db](https://github.com/shyshasy/Update_ABC_Corporation_db)
+[https://github.com/shyshasy/Order_Management](hhttps://github.com/shyshasy/Order_Management)
 
 ## Description
 Ce projet vise à gérer les entités clés de **ABC Corporation** (clients, produits, commandes, paiements) via une application Node.js interagissant avec une base de données MySQL. Il permet d'effectuer les opérations CRUD (Create, Read, Update, Delete) sur ces entités.
@@ -14,13 +14,16 @@ Ce projet vise à gérer les entités clés de **ABC Corporation** (clients, pro
 ## Prérequis
 - [Node.js ](https://nodejs.org/fr)
 - [MySQL ](https://www.mysql.com/)
-- [Readline-sync](https://www.npmjs.com/package/readline-sync)
 
-### Dépendances Node.js
-Installez les dépendances nécessaires avec la commande suivante :
-```bash
-npm install mysql2 
-```
+## Configuration de la connexion MySQL
+
+Avant de lancer l'application, vous devez configurer la connexion à votre base de données MySQL. Voici comment procéder :
+
+Ouvrez le fichier ./src/db.js 
+
+Modifiez les paramètres de connexion pour correspondre à votre environnement MySQL. Remplacez les valeurs des propriétés  `user` par votre nom d'utilisateur et `password` par votre mot de passe.
+
+
 # Fonctionnalités
 
 ## Gestion des clients
@@ -49,12 +52,12 @@ npm install mysql2
 
 
 ```bash
-git clone https://github.com/shyshasy/Update_ABC_Corporation_db
+git clone https://github.com/shyshasy/Order_Management.git
 ```
 
 
 ```bash
-cd Update_ABC_Corporation_db
+cd Order_Management
 ````
 ## Installer les dépendances :
 

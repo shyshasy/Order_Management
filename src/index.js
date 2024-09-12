@@ -4,6 +4,7 @@ const productManager = require('./products');
 const orderManager = require('./purchaseOrders');
 const paymentManager = require('./payments');
 
+
 async function mainMenu() {
   console.log("1. Gestion des clients");
   console.log("2. Gestion des produits");

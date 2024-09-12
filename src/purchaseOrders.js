@@ -218,7 +218,7 @@ async function getOrderWithDetails(orderId) {
 module.exports = {
   getOrders,
   addOrderWithDetails,
-  updateOrderWithDetails,
+  updateOrderWithDetails, // Assurez-vous que cette fonction est exportée
   deleteOrderWithDetails,
   getOrderWithDetails
 };
