@@ -4,6 +4,17 @@ const connPool = require('./db');
 async function addProduct(name, description, price, stock, category, barcode, status) {
   const connection = await connPool.getConnection();
   try {
+    // Vérifiez si le code-barres existe déjà
+    const [existingProduct] = await connection.execute(
+      "SELECT id FROM products WHERE barcode = ?",
+      [barcode]
+    );
+
+    if (existingProduct.length > 0) {
+      throw new Error(`Un produit avec le code-barres ${barcode} existe déjà.`);
+    }
+
+    // Ajouter le produit si le code-barres est unique
     const [result] = await connection.execute(
       "INSERT INTO products (name, description, price, stock, category, barcode, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [name, description, price, stock, category, barcode, status]
@@ -11,7 +22,11 @@ async function addProduct(name, description, price, stock, category, barcode, st
     console.log("Produit ajouté avec succès !");
     return result.insertId;
   } catch (error) {
-    console.error("Erreur lors de l'ajout du produit:", error.message);
+    if (error.code === 'ER_DUP_ENTRY') {
+      console.error(`Erreur: Un produit avec le code-barres ${barcode} existe déjà.`);
+    } else {
+      console.error("Erreur lors de l'ajout du produit:", error.message);
+    }
     throw error;
   } finally {
     connection.release();
@@ -36,6 +51,16 @@ async function getProducts() {
 async function updateProduct(id, name, description, price, stock, category, barcode, status) {
   const connection = await connPool.getConnection();
   try {
+    // Vérifiez si le code-barres est unique avant la mise à jour
+    const [existingProduct] = await connection.execute(
+      "SELECT id FROM products WHERE barcode = ? AND id != ?",
+      [barcode, id]
+    );
+
+    if (existingProduct.length > 0) {
+      throw new Error(`Un autre produit avec le code-barres ${barcode} existe déjà.`);
+    }
+
     const [result] = await connection.execute(
       "UPDATE products SET name = ?, description = ?, price = ?, stock = ?, category = ?, barcode = ?, status = ? WHERE id = ?",
       [name, description, price, stock, category, barcode, status, id]
@@ -51,42 +76,33 @@ async function updateProduct(id, name, description, price, stock, category, barc
 }
 
 // Supprimer un produit
-const db = require('./db'); // Assurez-vous que le chemin est correct
-
 async function deleteProduct(productId) {
-  let connection;
+  const connection = await connPool.getConnection();
   try {
-    connection = await db.getConnection();
-    
     // Supprimer les détails de commande associés
-    const [result1] = await connection.query('DELETE FROM order_details WHERE product_id = ?', [productId]);
+    const [result1] = await connection.execute('DELETE FROM order_details WHERE product_id = ?', [productId]);
     console.log(`Deleted ${result1.affectedRows} rows from order_details.`);
 
     // Supprimer le produit
-    const [result2] = await connection.query('DELETE FROM products WHERE id = ?', [productId]);
+    const [result2] = await connection.execute('DELETE FROM products WHERE id = ?', [productId]);
     console.log(`Deleted ${result2.affectedRows} rows from products.`);
     
     if (result2.affectedRows === 0) {
-      console.log(`No product found with ID ${productId}.`);
+      console.log(`Aucun produit trouvé avec l'ID ${productId}.`);
     } else {
-      console.log(`Product with ID ${productId} supprimer avec succès.`);
+      console.log(`Produit avec l'ID ${productId} supprimé avec succès.`);
     }
   } catch (err) {
-    console.error('Error deleting product:', err);
+    console.error('Erreur lors de la suppression du produit:', err.message);
+    throw err;
   } finally {
-    if (connection) {
-      connection.release();
-    }
+    connection.release();
   }
 }
 
 module.exports = {
+  addProduct,
+  getProducts,
+  updateProduct,
   deleteProduct
 };
-
-
-module.exports = {
-  deleteProduct
-};
-
-module.exports = { addProduct, getProducts, updateProduct, deleteProduct };
