@@ -97,8 +97,18 @@ async function addOrderWithDetails(customerId, orderDate, deliveryAddress, track
   } catch (error) {
     // Annule la transaction en cas d'erreur
     await connection.rollback();
-    console.error("Erreur lors de l'ajout de la commande avec ses détails:", error.message);
+
+    // Vérifiez le code d'erreur pour des erreurs spécifiques
+    if (error.code === 'ER_DUP_ENTRY') {
+        // Erreur de duplication (par exemple, numéro de suivi déjà existant)
+        console.log("Erreur : Le numéro de suivi que vous avez saisi existe déjà. Veuillez entrer un numéro de suivi différent.");
+    } else {
+        // Autres erreurs
+        console.error("Une erreur est survenue lors de l'ajout de la commande avec ses détails:", error.message);
+    }
+
     throw error;
+
   } finally {
     connection.release();
   }
@@ -148,7 +158,7 @@ async function updateOrderWithDetails(orderId, customerId, orderDate, deliveryAd
     return orderId;
   } catch (error) {
     await connection.rollback();
-    console.error("Erreur lors de la mise à jour de la commande avec ses détails:", error.message);
+    console.log("Erreur lors de la mise à jour de la commande avec ses détails:", error.message);
     throw error;
   } finally {
     connection.release();
@@ -208,7 +218,7 @@ async function getOrderWithDetails(orderId) {
 
     return { order: order[0], details };
   } catch (error) {
-    console.error("Erreur lors de la récupération de la commande avec ses détails:", error.message);
+    console.log("Erreur lors de la récupération de la commande avec ses détails:", error.message);
     throw error;
   } finally {
     connection.release();

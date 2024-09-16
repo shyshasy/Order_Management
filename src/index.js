@@ -1,8 +1,8 @@
 const readlineSync = require('readline-sync');
-const customerManager = require('./customers');
-const productManager = require('./products');
-const orderManager = require('./purchaseOrders');
-const paymentManager = require('./payments');
+const customerManager = require('./customer');
+const productManager = require('./product');
+const orderManager = require('./purchaseOrder');
+const paymentManager = require('./payment');
 
 async function mainMenu() {
   console.log("1. Gestion des clients");
@@ -69,69 +69,88 @@ async function handleCustomerMenu() {
   } while (choix !== '0');
 }
 
+// async function productMenu() {
+//   console.log("1. Ajouter un produit");
+//   console.log("2. Lister tous les produits");
+//   console.log("3. Mettre à jour un produit");
+//   console.log("4. Supprimer un produit");
+//   console.log("0. Retour au menu principal");
+//   const choix = readlineSync.question("Votre choix: ");
+//   return choix;
+// }
+
+// async function productMenu() {
+//   console.log("1. Ajouter un produit");
+//   console.log("2. Lister tous les produits");
+//   console.log("3. Mettre à jour un produit");
+//   console.log("4. Supprimer un produit");
+//   console.log("0. Retour au menu principal");
+//   const choix = readlineSync.question("Votre choix: ");
+//   return choix;
+// }
 async function productMenu() {
   console.log("1. Ajouter un produit");
   console.log("2. Lister tous les produits");
   console.log("3. Mettre à jour un produit");
   console.log("4. Supprimer un produit");
-  console.log("0. Retour au menu principal");
-  const choix = readlineSync.question("Votre choix: ");
+  console.log("q. Quitter le menu");
+  const choix = readlineSync.question("Votre choix : ");
   return choix;
 }
 
 async function handleProductMenu() {
   let choix;
+
   do {
     choix = await productMenu();
     try {
       switch (choix) {
-        case '1':
-          const productName = readlineSync.question("Nom du produit: ");
-          const description = readlineSync.question("Description du produit: ");
-          const price = readlineSync.questionFloat("Prix du produit: ");
-          const stock = readlineSync.questionInt("Quantité en stock: ");
-          const category = readlineSync.question("Catégorie du produit: ");
-          const barcode = readlineSync.question("Code-barres du produit: ");
-          const status = readlineSync.question("Statut (available/unavailable): ");
-          await productManager.addProduct(productName, description, price, stock, category, barcode, status);
-          console.log("Produit ajouté avec succès !");
+        case '1': // Ajouter un produit
+          let codeBarresUnique = false;
+          let codeBarres;
+
+          while (!codeBarresUnique) {
+            const nomProduit = readlineSync.question("Nom du produit : ");
+            const description = readlineSync.question("Description du produit : ");
+            const prix = readlineSync.questionFloat("Prix du produit : ");
+            const stock = readlineSync.questionInt("Quantité en stock : ");
+            const categorie = readlineSync.question("Catégorie du produit : ");
+            codeBarres = readlineSync.question("Code-barres du produit : ");
+            const statut = readlineSync.question("Statut (available/unavailable) : ");
+
+            if (!['available', 'unavailable'].includes(statut)) {
+              console.error('Erreur : Statut invalide. Utilisez "available" ou "unavailable".');
+              break; // Sortir de la boucle si le statut est invalide
+            }
+
+            try {
+              // Tenter d'ajouter le produit
+              await productManager.addProduct(nomProduit, description, prix, stock, categorie, codeBarres, statut);
+              codeBarresUnique = true; // Code-barres est unique, produit ajouté
+              console.log("Produit ajouté avec succès !");
+            } catch (error) {
+              if (error.message.includes('Le produit avec le code-barres')) {
+                // Remplacer le message d'erreur technique par un message plus clair
+                console.error("Erreur : Ce code-barres est déjà utilisé pour un autre produit. Veuillez choisir un code-barres différent.");
+              } else {
+                // Gérer toute autre erreur
+                console.error("Erreur lors de l'ajout du produit :", error.message);
+              }
+            }
+          }
           break;
 
-        case '2':
-          const products = await productManager.getProducts();
-          console.log("Liste des produits:", products);
-          break;
-
-        case '3':
-          const productIdToUpdate = readlineSync.questionInt("ID du produit à mettre à jour: ");
-          const newProductName = readlineSync.question("Nouveau nom du produit: ");
-          const newDescription = readlineSync.question("Nouvelle description du produit: ");
-          const newPrice = readlineSync.questionFloat("Nouveau prix du produit: ");
-          const newStock = readlineSync.questionInt("Nouvelle quantité en stock: ");
-          const newCategory = readlineSync.question("Nouvelle catégorie du produit: ");
-          const newBarcode = readlineSync.question("Nouveau code-barres du produit: ");
-          const newStatus = readlineSync.question("Nouveau statut (available/unavailable): ");
-          await productManager.updateProduct(productIdToUpdate, newProductName, newDescription, newPrice, newStock, newCategory, newBarcode, newStatus);
-          console.log("Produit mis à jour avec succès !");
-          break;
-
-        case '4':
-          const productIdToDelete = readlineSync.questionInt("ID du produit à supprimer: ");
-          await productManager.deleteProduct(productIdToDelete);
-          console.log("Produit supprimé avec succès !");
-          break;
-
-        case '0':
-          console.log("Retour au menu principal");
-          break;
+        // Autres options du menu...
 
         default:
-          console.log("Choix invalide, veuillez réessayer.");
+          if (choix !== 'q') {
+            console.log("Option non reconnue. Veuillez choisir une option valide.");
+          }
       }
     } catch (error) {
-      console.error('Erreur lors de l\'exécution de l\'option:', error);
+      console.error("Erreur lors de l'exécution de l'option :", error.message);
     }
-  } while (choix !== '0');
+  } while (choix !== 'q'); 
 }
 
 
@@ -202,7 +221,7 @@ async function addOrder() {
 
   // Validation du statut
   if (!['pending', 'shipped', 'completed'].includes(status)) {
-    console.error('Erreur: Statut de la commande invalide. Utilisez "pending", "shipped", ou "completed".');
+    console.log('Erreur: Statut de la commande invalide. Utilisez "pending", "shipped", ou "completed".');
     return;
   }
 
@@ -224,7 +243,7 @@ async function addOrder() {
 
         // Validation des détails du produit
         if (isNaN(productId) || isNaN(quantity) || isNaN(price) || quantity <= 0 || price <= 0) {
-          console.error('Erreur: Assurez-vous que les valeurs du produit sont correctes.');
+          console.log('Erreur: Assurez-vous que les valeurs du produit sont correctes.');
           break;
         }
 
@@ -245,8 +264,9 @@ async function addOrder() {
           );
           console.log('Commande et détails créés avec succès.');
         } catch (error) {
-          console.error('Erreur lors de l\'ajout de la commande avec ses détails:', error.message);
+          console.log('Le numéro de suivi saisi existe déjà. Veuillez entrer un autre numéro.');
         }
+        
         break;
 
       case 2: // Annuler l'ajout
@@ -268,7 +288,7 @@ async function updateOrder() {
 
   // Validation du statut
   if (!['pending', 'shipped', 'completed'].includes(newStatus)) {
-    console.error('Erreur: Statut de la commande invalide. Utilisez "pending", "shipped", ou "completed".');
+    console.log('Erreur: Statut de la commande invalide. Utilisez "pending", "shipped", ou "completed".');
     return;
   }
 

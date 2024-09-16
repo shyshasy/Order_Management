@@ -38,13 +38,25 @@ cd Order_Management
 ````
 ## Installer les dépendances :
 
+
 ````bash
 npm install
 ````
 
+
+
 Configurez la connexion MySQL dans le fichier db.js 
 
 Lancez l'application :
+
+```bash
+cd Order_Management
+```
+
+```bash
+cd src
+````
+
 
 ```bash
 node index.js
