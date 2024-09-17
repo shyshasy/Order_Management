@@ -1,0 +1,120 @@
+[33mcommit 58769e1066077a1dea8d98c689fcfa6c3b0c4528[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Mon Sep 16 17:29:19 2024 +0000
+
+    Validated all changes and updates
+
+[33mcommit bf0e273701c97fae08df9916b1baa493f361dcde[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Sun Sep 15 22:00:31 2024 +0000
+
+    update customers functions
+
+[33mcommit b50b0b494419b551fb511577713ac7f82304e37f[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Sun Sep 15 21:49:34 2024 +0000
+
+    Updated submodule Order_Management
+
+[33mcommit 4c9327989a44e99426646bd22adffdfaba5a344b[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Sun Sep 15 21:26:22 2024 +0000
+
+     ignore file commit
+
+[33mcommit 26264ff1c184457c9a1e377a719c4902e0a05fa1[m
+Merge: a38cc90 8ddc8d0
+Author: shysha <shyshasy@gmail.com>
+Date:   Sun Sep 15 21:22:23 2024 +0000
+
+    Resolved conflicts after merging unrelated histories
+
+[33mcommit a38cc90a7bf6d8caa52612e9cff32b8a5bb467f2[m[33m ([m[1;32mmaster[m[33m)[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Sun Sep 15 21:15:54 2024 +0000
+
+    Improved error and exception handling in the code
+
+[33mcommit 8ddc8d019ec79dee96f012fd7ff81ab55e697a70[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Thu Sep 12 21:25:16 2024 +0000
+
+    Reorganized README file
+
+[33mcommit 9db46056b9be9d79d831c94087a2cb998b4d7705[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Thu Sep 12 21:13:53 2024 +0000
+
+    Tested and fixed all code functionalities
+
+[33mcommit c2f979ef79213f5edcc7e161dfb1962a65936f65[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Thu Sep 12 14:40:06 2024 +0000
+
+    fix: corrected order deletion with details handling
+
+[33mcommit 610a46c49ad4e4b9adfa95ab07e517511ebd7c37[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Thu Sep 12 14:27:45 2024 +0000
+
+     correction update order commit
+
+[33mcommit d13401505ed707768c4cc3e27778db27d9778624[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Thu Sep 12 12:53:27 2024 +0000
+
+    theard fix for README
+
+[33mcommit 4a62597fe1861273f83cbedf7d454d2ecbef5e2f[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Thu Sep 12 09:53:06 2024 +0000
+
+    Second fix for README
+
+[33mcommit 5c8072eabea1f53342089ecec192b2c813ddcd57[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Thu Sep 12 09:50:26 2024 +0000
+
+    Fix README
+
+[33mcommit f2f2408fe1424637faec85539fe08394e5c3d69d[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Thu Sep 12 09:34:11 2024 +0000
+
+    update readme
+
+[33mcommit f0da1ca136bc02aa17cbe64003ae27a0215d5c6c[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Thu Sep 12 09:22:43 2024 +0000
+
+    modify readme commit
+
+[33mcommit 866b0a97ec1545f7ed1cb694d83540e65d49e4fa[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Thu Sep 12 08:22:55 2024 +0000
+
+    add readme commit
+
+[33mcommit 94ba1f37508f69518ae3d46ba781218ec4c9131c[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Thu Sep 12 06:45:50 2024 +0000
+
+    testing code commit
+
+[33mcommit f6c6026a6a44a47d145bbc6a05183313b4a122f3[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Wed Sep 11 09:38:11 2024 +0000
+
+    debug  purchasOrders commit
+
+[33mcommit 5b790c5ddf4481ab2a087ff21a8961b5ebbd9241[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Tue Sep 10 15:38:01 2024 +0000
+
+    modify purchaseOrders commit
+
+[33mcommit b631d647dcb435b1f9851c734fe447bd425850b7[m
+Author: shysha <shyshasy@gmail.com>
+Date:   Tue Sep 10 15:28:55 2024 +0000
+
+    fist commit
