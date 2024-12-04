@@ -104,27 +104,22 @@ async function handleCustomerMenu() {
 //   const choix = readlineSync.question("Votre choix: ");
 //   return choix;
 // }
-// const readlineSync = require('readline-sync');  // Assurez-vous que readline-sync est installé
-
-// Fonction pour afficher le menu et retourner le choix de l'utilisateur
-function productMenu() {
-  console.log("=== Menu Produits ===");
-  console.log("1 - Ajouter un produit");
-  console.log("2 - Lister tous les produits");
-  console.log("3 - Mettre à jour un produit");
-  console.log("4 - Supprimer un produit");
-  console.log("q - Quitter");
-
+async function productMenu() {
+  console.log("1. Ajouter un produit");
+  console.log("2. Lister tous les produits");
+  console.log("3. Mettre à jour un produit");
+  console.log("4. Supprimer un produit");
+  console.log("q. Quitter le menu");
   const choix = readlineSync.question("Votre choix : ");
   return choix;
 }
-
 
 async function handleProductMenu() {
   let choix;
 
   do {
-    choix = await productMenu();
+    choix = await productMenu();  // Assurez-vous que productMenu retourne les options correctement
+
     try {
       switch (choix) {
         case '1': // Ajouter un produit
@@ -142,7 +137,7 @@ async function handleProductMenu() {
 
             if (!['available', 'unavailable'].includes(statut)) {
               console.error('Erreur : Statut invalide. Utilisez "available" ou "unavailable".');
-              break;
+              break; // Sortir de la boucle si le statut est invalide
             }
 
             try {
@@ -159,59 +154,96 @@ async function handleProductMenu() {
           }
           break;
 
-        case '2': // Lister tous les produits
+        case '2': // Lister les produits
           try {
-            const produits = await productManager.getAllProducts(); // Récupérer la liste des produits
-            console.log("Liste des produits :", produits);
+            const products = await productManager.getAllProducts();  // Implémentez cette méthode dans votre gestionnaire
+            console.log("Liste des produits :", products);
           } catch (error) {
             console.error("Erreur lors de la récupération des produits :", error.message);
           }
           break;
 
-        case '3': // Mettre à jour un produit
+        case '3': // Supprimer un produit
+          const codeBarresASupprimer = readlineSync.question("Code-barres du produit à supprimer : ");
           try {
-            const codeBarres = readlineSync.question("Code-barres du produit à mettre à jour : ");
-            const produitExistant = await productManager.getProductByBarcode(codeBarres);
-
-            if (produitExistant) {
-              const nouveauNom = readlineSync.question(`Nouveau nom (${produitExistant.name}) : `) || produitExistant.name;
-              const nouvelleDescription = readlineSync.question(`Nouvelle description (${produitExistant.description}) : `) || produitExistant.description;
-              const nouveauPrix = readlineSync.questionFloat(`Nouveau prix (${produitExistant.price}) : `) || produitExistant.price;
-              const nouveauStock = readlineSync.questionInt(`Nouveau stock (${produitExistant.stock}) : `) || produitExistant.stock;
-              const nouvelleCategorie = readlineSync.question(`Nouvelle catégorie (${produitExistant.category}) : `) || produitExistant.category;
-              const nouveauStatut = readlineSync.question(`Nouveau statut (available/unavailable) (${produitExistant.status}) : `) || produitExistant.status;
-
-              await productManager.updateProduct(codeBarres, nouveauNom, nouvelleDescription, nouveauPrix, nouveauStock, nouvelleCategorie, nouveauStatut);
-              console.log("Produit mis à jour avec succès !");
-            } else {
-              console.log(`Aucun produit trouvé avec le code-barres ${codeBarres}.`);
-            }
-          } catch (error) {
-            console.error("Erreur lors de la mise à jour du produit :", error.message);
-          }
-          break;
-
-        case '4': // Supprimer un produit
-          try {
-            const codeBarres = readlineSync.question("Code-barres du produit à supprimer : ");
-            await productManager.deleteProduct(codeBarres);
+            await productManager.deleteProduct(codeBarresASupprimer);  // Assurez-vous que deleteProduct existe
             console.log("Produit supprimé avec succès !");
           } catch (error) {
             console.error("Erreur lors de la suppression du produit :", error.message);
           }
           break;
 
-        case 'q': // Quitter
-          console.log("Quitter le menu.");
+        case 'q': // Quitter le menu
+          console.log("Retour au menu principal.");
           break;
 
         default:
-          console.log("Option non reconnue. Veuillez choisir une option valide.");
+          if (choix !== 'q') {
+            console.log("Option non reconnue. Veuillez choisir une option valide.");
+          }
       }
     } catch (error) {
       console.error("Erreur lors de l'exécution de l'option :", error.message);
     }
   } while (choix !== 'q');
+}
+
+
+async function orderMenu() {
+  const choices = [
+    'Ajouter une nouvelle commande avec ses détails',
+    'Mettre à jour les informations d\'une commande et ses détails',
+    'Supprimer une commande avec ses détails',
+    'Lister une commande avec ses détails',
+    'Retour'
+  ];
+
+  const index = readlineSync.keyInSelect(choices, 'Choisissez une option:');
+  return index;
+}
+
+async function orderDetailMenu() {
+  console.log("1. Ajouter un détail de commande");
+  console.log("2. Mettre à jour un détail de commande");
+  console.log("3. Supprimer un détail de commande");
+  console.log("4. Afficher les détails de la commande");
+  console.log("0. Retour au menu des commandes");
+  const choix = readlineSync.question("Votre choix: ");
+  return choix;
+}
+
+async function handleOrderMenu() {
+  let choix;
+
+  do {
+    choix = await orderMenu();
+
+    switch (choix) {
+      case 0: // Ajouter une nouvelle commande avec ses détails
+        await addOrder();
+        break;
+
+      case 1: // Mettre à jour les informations d'une commande et ses détails
+        await updateOrder();
+        break;
+
+      case 2: // Supprimer une commande avec ses détails
+        await deleteOrder();
+        break;
+
+      case 3: // Lister une commande avec ses détails
+        await listOrder();
+        break;
+
+      case 4: // Retour
+        console.log('Retour au menu principal.');
+        break;
+
+      default:
+        console.log('Option invalide. Veuillez choisir une option valide.');
+        break;
+    }
+  } while (choix !== 4); // 4 correspond à "Retour"
 }
 
 async function addOrder() {

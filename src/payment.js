@@ -77,16 +77,13 @@ const addPayment = async (orderId, date, amount, paymentMethod) => {
 async function updatePayment(paymentId, orderId, paymentDate, amount, paymentMethod) {
   const connection = await pool.getConnection();
   try {
-    const sanitizedOrderId = (orderId !== undefined && orderId !== null) ? orderId : null;
-    const sanitizedPaymentDate = (paymentDate !== undefined && paymentDate !== null) ? paymentDate : null;
-    const sanitizedAmount = (amount !== undefined && amount !== null) ? parseFloat(amount) : null;
-    const sanitizedPaymentMethod = (paymentMethod !== undefined && paymentMethod !== null) ? paymentMethod : null;
+    const sanitizedOrderId = orderId ? orderId : null;
+    const sanitizedPaymentDate = paymentDate ? paymentDate : null;
+    const sanitizedAmount = amount ? parseFloat(amount) : null;
+    const sanitizedPaymentMethod = paymentMethod ? paymentMethod : null;
 
     if (isNaN(sanitizedAmount)) {
       throw new Error('Le montant fourni est invalide. Il doit être un nombre.');
-    }
-    if (sanitizedAmount === null) {
-      throw new Error('Le montant ne peut pas être null.');
     }
 
     if (sanitizedPaymentDate && !/^\d{4}-\d{2}-\d{2}$/.test(sanitizedPaymentDate)) {
@@ -102,14 +99,24 @@ async function updatePayment(paymentId, orderId, paymentDate, amount, paymentMet
       throw new Error('Aucun paiement trouvé avec cet ID.');
     }
 
+    console.log('Paiement mis à jour avec succès.');
     return result.affectedRows;
+
   } catch (error) {
-    console.error('Erreur lors de la mise à jour du paiement:', error);
-    throw error;
+    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+      // Gestion personnalisée de l'erreur de contrainte de clé étrangère
+      console.error('Erreur de contrainte de clé étrangère:', error.message);
+      throw new Error('Impossible de mettre à jour le paiement car la commande associée n\'existe pas.');
+    } else {
+      // Gestion d'autres types d'erreurs
+      console.error('Erreur lors de la mise à jour du paiement:', error.message);
+      throw new Error('La mise à jour du paiement a échoué. Veuillez vérifier les données fournies.');
+    }
   } finally {
     connection.release();
   }
 }
+
 
 
 // Fonction pour supprimer un paiement
