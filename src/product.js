@@ -1,29 +1,41 @@
 const connPool = require('./db');
 
 // Ajouter ou mettre à jour un produit
-async function addOrUpdateProduct(name, description, price, stock, category, barcode, status) {
+async function addProduct(name, description, price, stock, category, barcode, status) {
   const connection = await connPool.getConnection();
 
   try {
     await connection.execute(
       `INSERT INTO products (name, description, price, stock, category, barcode, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE
-         name = VALUES(name),
-         description = VALUES(description),
-         price = VALUES(price),
-         stock = VALUES(stock),
-         category = VALUES(category),
-         status = VALUES(status)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [name, description, price, stock, category, barcode, status]
     );
-    console.log("Produit ajouté ou mis à jour avec succès!");
+    console.log("Produit ajouté avec succès!");
   } catch (error) {
     if (error.code === 'ER_DUP_ENTRY') {
       console.error(`Erreur de duplication : ${error.sqlMessage}`);
     } else {
-      console.error(`Erreur lors de l'ajout ou de la mise à jour du produit : ${error.message}`);
+      console.error(`Erreur lors de l'ajout du produit : ${error.message}`);
     }
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+async function updateProduct(name, description, price, stock, category, barcode, status) {
+  const connection = await connPool.getConnection();
+
+  try {
+    await connection.execute(
+      `UPDATE products 
+       SET name = ?, description = ?, price = ?, stock = ?, category = ?, status = ? 
+       WHERE barcode = ?`,
+      [name, description, price, stock, category, status, barcode]
+    );
+    console.log("Produit mis à jour avec succès!");
+  } catch (error) {
+    console.error(`Erreur lors de la mise à jour du produit : ${error.message}`);
     throw error;
   } finally {
     connection.release();
@@ -79,8 +91,26 @@ async function getProductByBarcode(barcode) {
   }
 }
 
+async function getAllProducts() {
+  const connection = await connPool.getConnection();
+
+  try {
+    const [rows] = await connection.execute(
+      'SELECT * FROM products'
+    );
+    return rows;
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la liste des produits :", error.message);
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
 module.exports = {
-  addOrUpdateProduct,
+  addProduct,
+  updateProduct,
+  getAllProducts,
   deleteProduct,
   getProductByBarcode
 };

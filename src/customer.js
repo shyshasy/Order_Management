@@ -80,8 +80,9 @@ async function addCustomer(name, email, phone, address) {
     );
     return result.insertId;
   } catch (error) {
+    // Afficher uniquement le message de l'erreur sans le stack trace Node.js
     console.error("Erreur lors de l'ajout du client:", error.message);
-    throw error;
+    throw new Error(error.message); // Relancer seulement le message d'erreur
   } finally {
     connection.release();
   }

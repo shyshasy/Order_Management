@@ -1,4 +1,4 @@
-# Order_Management
+# Order Management
 
 ## Description
 Ce projet vise à gérer les entités clés de **ABC Corporation** (clients, produits, commandes, paiements) via une application Node.js interagissant avec une base de données MySQL. Il permet d'effectuer les opérations CRUD (Create, Read, Update, Delete) sur ces entités.
@@ -44,14 +44,8 @@ npm install
 ````
 
 
-
-Configurez la connexion MySQL dans le fichier db.js 
-
 Lancez l'application :
 
-```bash
-cd Order_Management
-```
 
 ```bash
 cd src
